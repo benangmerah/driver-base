@@ -1,0 +1,12 @@
+{
+  "name": "benangmerah-driver-base",
+  "description": "Base BenangMerah driver class.",
+  "version": "0.0.1",
+  "main": "./BmDriverBase.js",
+  "private": true,
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "n3": "^0.2.7",
+    "minimist": "0.0.8"
+  }
+}
