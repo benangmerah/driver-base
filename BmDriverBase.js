@@ -140,6 +140,10 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
       constructor = module.parent.exports;
     }
 
+    if (!options) {
+      options = {};
+    }
+
     var driverInstance = new constructor();
 
     var argv = minimist(process.argv.slice(2));
