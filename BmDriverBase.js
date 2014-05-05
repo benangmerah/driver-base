@@ -78,33 +78,63 @@ function addTriple(theSubject, thePredicate, theObject) {
 };
 
 /**
- * Method to call when logging a verbose event (i.e. not an error).
- * @protected
- * @param {*} theInfo
- * @event verbose
+ * Method to call when logging something
+ * @param  {string} level
+ * @param  {*} message
+ * @event log
  */
-BmDriverBase.prototype.verbose = function info(theInfo) {
-  this.emit('verbose', theInfo);
-}
+BmDriverBase.prototype.log = function log(level, message) {
+  this.emit('log', level, message);
+};
 
 /**
- * Method to call when logging an informational event (i.e. not an error).
+ * Method to call to log a debug-level message.
  * @protected
- * @param {*} theInfo
- * @event info
+ * @param {*} message
+ * @event log
  */
-BmDriverBase.prototype.info = function info(theInfo) {
-  this.emit('info', theInfo);
-}
+BmDriverBase.prototype.debug = function debug(message) {
+  this.log('debug', message);
+};
 
 /**
- * Method to call when an error occurs. Emits the 'error' event.
+ * Method to call to log a verbose-level message.
  * @protected
- * @param {*} theError
- * @event error
+ * @param {*} message
+ * @event log
  */
-BmDriverBase.prototype.error = function error(theError) {
-  this.emit('error', theError);
+BmDriverBase.prototype.verbose = function verbose(message) {
+  this.log('verbose', message);
+};
+
+/**
+ * Method to call to log an info-level message.
+ * @protected
+ * @param {*} message
+ * @event log
+ */
+BmDriverBase.prototype.info = function info(message) {
+  this.log('info', message);
+};
+
+/**
+ * Method to call to log a warn-level message.
+ * @protected
+ * @param {*} message
+ * @event log
+ */
+BmDriverBase.prototype.warn = function warn(message) {
+  this.log('warn', message);
+};
+
+/**
+ * Method to call to log an error-level message.
+ * @protected
+ * @param {*} message
+ * @event log
+ */
+BmDriverBase.prototype.error = function error(message) {
+  this.log('error', message);
 };
 
 /**
@@ -119,8 +149,8 @@ BmDriverBase.prototype.finish = function finish() {
  * Fetch data from the datasource. Method to be overridden by child classes.
  * This method should:
  * - call this.addTriple() to add a triple.
- * - call this.error() when an error occurs.
  * - call this.finish() when the operation is finished.
+ * - call this.log(), this.info(), this.debug(), etc anytime in between.
  */
 BmDriverBase.prototype.fetch = function fetch() {};
 
@@ -135,6 +165,7 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     var fs = require('fs');
     var minimist = require('minimist');
     var n3 = require('n3');
+    var logger = require('winston');
 
     var rdfNS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
     var rdfsNS = 'http://www.w3.org/2000/01/rdf-schema#';
@@ -178,12 +209,12 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     }
 
     if (!options.outputFile) {
-      console.error('No output file specified.');
+      logger.error('No output file specified.');
       return;
     }
 
     if (fs.existsSync(options.outputFile) && !options.force) {
-      console.error('File %s already exists. Use --force to override.', options.outputFile);
+      logger.error('File %s already exists. Use --force to override.', options.outputFile);
       return;
     }
 
@@ -192,7 +223,7 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     driverInstance.on('addTriple', function(s, p, o) {
       writer.addTriple(s, p, o);
     });
-    driverInstance.on('error', console.error);
+    driverInstance.on('log', logger.log);
     driverInstance.on('finish', function() {
       writer.end(function(err, data) {
         if (!err) {
