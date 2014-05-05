@@ -78,9 +78,30 @@ function addTriple(theSubject, thePredicate, theObject) {
 };
 
 /**
+ * Method to call when logging a verbose event (i.e. not an error).
+ * @protected
+ * @param {*} theInfo
+ * @event verbose
+ */
+BmDriverBase.prototype.verbose = function info(theInfo) {
+  this.emit('verbose', theInfo);
+}
+
+/**
+ * Method to call when logging an informational event (i.e. not an error).
+ * @protected
+ * @param {*} theInfo
+ * @event info
+ */
+BmDriverBase.prototype.info = function info(theInfo) {
+  this.emit('info', theInfo);
+}
+
+/**
  * Method to call when an error occurs. Emits the 'error' event.
  * @protected
  * @param {*} theError
+ * @event error
  */
 BmDriverBase.prototype.error = function error(theError) {
   this.emit('error', theError);
@@ -88,6 +109,7 @@ BmDriverBase.prototype.error = function error(theError) {
 
 /**
  * Method to call when fetching has completed. Emits the 'finish' event.
+ * @event finish
  */
 BmDriverBase.prototype.finish = function finish() {
   this.emit('finish');
