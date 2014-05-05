@@ -54,7 +54,7 @@ BmDriverBase.prototype.defaultOptions = {};
  */
 BmDriverBase.prototype.setOptions = function setOptions(newOptions) {
   this.options = _.defaults(newOptions, this.defaultOptions);
-}
+};
 
 /**
  * Set the lastFetched property of this instance.
@@ -63,7 +63,7 @@ BmDriverBase.prototype.setOptions = function setOptions(newOptions) {
  */
 BmDriverBase.prototype.setLastFetched = function setLastFetched(lastFetched) {
   this.lastFetched = lastFetched;
-}
+};
 
 /**
  * Method to call when a triple should be added to the graph.
@@ -75,7 +75,7 @@ BmDriverBase.prototype.setLastFetched = function setLastFetched(lastFetched) {
 BmDriverBase.prototype.addTriple =
 function addTriple(theSubject, thePredicate, theObject) {
   this.emit('addTriple', theSubject, thePredicate, theObject);
-}
+};
 
 /**
  * Method to call when an error occurs. Emits the 'error' event.
@@ -84,14 +84,14 @@ function addTriple(theSubject, thePredicate, theObject) {
  */
 BmDriverBase.prototype.error = function error(theError) {
   this.emit('error', theError);
-}
+};
 
 /**
  * Method to call when fetching has completed. Emits the 'finish' event.
  */
 BmDriverBase.prototype.finish = function finish() {
   this.emit('finish');
-}
+};
 
 /**
  * Fetch data from the datasource. Method to be overridden by child classes.
@@ -100,7 +100,7 @@ BmDriverBase.prototype.finish = function finish() {
  * - call this.error() when an error occurs.
  * - call this.finish() when the operation is finished.
  */
-BmDriverBase.prototype.fetch = function fetch() {}
+BmDriverBase.prototype.fetch = function fetch() {};
 
 /**
  * Convenience function to handle CLI.
@@ -181,4 +181,4 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
 
     driverInstance.fetch();
   }
-}
+};
