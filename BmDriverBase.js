@@ -176,6 +176,9 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     var bpsNS = 'http://benangmerah.net/place/idn/bps/';
     var geoNS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
     var qbNS = 'http://purl.org/linked-data/cube#';
+    var orgNS = 'http://www.w3.org/ns/org#';
+    var dctNS = 'http://purl.org/dc/terms/';
+    var skosNS = 'http://www.w3.org/2004/02/skos/core#';
 
     var prefixes = {
       'rdf': rdfNS,
@@ -185,7 +188,10 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
       'bps': bpsNS,
       'geo': geoNS,
       'qb': qbNS,
-      'bm': ontNS
+      'bm': ontNS,
+      'org': orgNS,
+      'dct': dctNS,
+      'skos': skosNS
     };
 
     if (!options) {
@@ -204,30 +210,40 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     options = _.extend(options, argv);
     driverInstance.setOptions(options);
 
+    var outputStream;
     if (!options.outputFile && argv._.length > 0) {
       options.outputFile = argv._[0];
+
+      if (fs.existsSync(options.outputFile) && !options.force) {
+        logger.error('File %s already exists. Use --force to override.', options.outputFile);
+        return;
+      }
+
+      outputStream = fs.writeFile(options.outputFile);
     }
 
     if (!options.outputFile) {
-      logger.error('No output file specified.');
-      return;
-    }
-
-    if (fs.existsSync(options.outputFile) && !options.force) {
-      logger.error('File %s already exists. Use --force to override.', options.outputFile);
-      return;
+      outputStream = process.stdout;
     }
 
     var writer = n3.Writer(prefixes);
+    var shouldWrite;
 
+    driverInstance.once('addTriple', function() {
+      shouldWrite = true;
+    });
     driverInstance.on('addTriple', function(s, p, o) {
       writer.addTriple(s, p, o);
     });
     driverInstance.on('log', logger.log);
     driverInstance.on('finish', function() {
+      if (!shouldWrite) {
+        return;
+      }
+
       writer.end(function(err, data) {
         if (!err) {
-          fs.writeFileSync(options.outputFile, data);
+          outputStream.write(data);
         }
       });
     });
