@@ -219,7 +219,7 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
         return;
       }
 
-      outputStream = fs.writeFile(options.outputFile);
+      outputStream = fs.createWriteStream(options.outputFile);
     }
 
     if (!options.outputFile) {
