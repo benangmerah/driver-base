@@ -165,7 +165,6 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     var fs = require('fs');
     var minimist = require('minimist');
     var n3 = require('n3');
-    var logger = require('winston');
 
     var rdfNS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
     var rdfsNS = 'http://www.w3.org/2000/01/rdf-schema#';
@@ -215,7 +214,7 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
       options.outputFile = argv._[0];
 
       if (fs.existsSync(options.outputFile) && !options.force) {
-        logger.error('File %s already exists. Use --force to override.', options.outputFile);
+        console.error('File %s already exists. Use --force to override.', options.outputFile);
         return;
       }
 
@@ -235,7 +234,9 @@ BmDriverBase.handleCLI = function handleCLI(constructor, options) {
     driverInstance.on('addTriple', function(s, p, o) {
       writer.addTriple(s, p, o);
     });
-    driverInstance.on('log', logger.log);
+    driverInstance.on('log', function(level, message) {
+      console.error(level + ': ' + message);
+    });
     driverInstance.on('finish', function() {
       if (!shouldWrite) {
         return;
